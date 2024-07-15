@@ -9,24 +9,7 @@ enum CHARACTER_TYPES {
 	FONT_TRUECOLOUR = 16,
 };
 
-int legacy_colour[16] = {
-	0x000000,
-	0x0000aa,
-	0x00aa00,
-	0x00aaaa,
-	0xaa0000,
-	0xaa00aa,
-	0xaa5500,
-	0xaaaaaa,
-	0x555555,
-	0x5555ff,
-	0x55ff55,
-	0x55ffff,
-	0xff5555,
-	0xff55ff,
-	0xffff55,
-	0xffffff
-};
+extern int legacy_colour[16];
 
 typedef struct size_2d {
 	int width;
@@ -48,3 +31,8 @@ typedef struct _rect_2d {
 } rect_2d_t;
 
 extern rect_2d_t root_window;
+
+typedef void (* font_drawer_t)(uint32_t * fb, uint32_t chr, uint32_t colour, uint32_t position);
+
+void gfx_init();
+int txt_string_draw(uint16_t * string, int x, int y, uint32_t colour, rect_2d_t * rect);
