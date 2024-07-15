@@ -12,7 +12,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	mmap_parse();
 	cprintf(7, u"Kernel loaded \1!\n");
 	cprintf(7, u"\n");
-	cprintf(7, u"You are using v%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, os_name16);
+	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
 	cprintf(7, u"\n\n");
 	cprintf(7, u"Memory Test:\n");
 	cprintf(7, u" - Heap: 0x%x\n", heap);
