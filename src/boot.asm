@@ -24,12 +24,12 @@ section .text
 align 16
 
 global start
-; extern kernel_main
+extern main
 start:
 	cli
 	mov esp, stack_top
 	push ebx
 	push eax
-;	call kernel_main ; no main yet
+	call main
 	cli
 	hlt
