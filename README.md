@@ -1,10 +1,10 @@
-# lemornoninasoasfadsfngjd
+#lemornoninasoasfadsfngjd
 
-### asrtuf to do
+### asrtuf à faire
 
-- [x] Print stuff
-- [x] Manage some memory
+- [x] Afficher des trucs
+- [x] Gérer de la mémoire
 - [ ] FPU
 - [ ] ACPI
-- [ ] Make Thread
-- [ ] Make Processes
+- [ ] Créer un fil d'execution
+- [ ] Créer des processus
