@@ -3,7 +3,7 @@
 
 rect_2d_t root_window;
 
-void gfx_init(multiboot_header_t * multiboot_header) {
+void gfx_init() {
 	root_window.fb = (uint32_t *) (uint32_t) multiboot_header->framebuffer;
 	root_window.cursor.x = 0;
 	root_window.cursor.y = 0;
