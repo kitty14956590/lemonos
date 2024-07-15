@@ -60,3 +60,16 @@ void * phy_malloc(size_t size) {
 	current_block->size = required_size;
 	return ((void *) current_block) + sizeof(memory_block_t);
 }
+
+int phy_free(void * data) {
+	memory_block_t * block;
+	if (data < heap || data > heap_end) {
+		return 0;
+	}
+	block = (memory_block_t *) (data - sizeof(memory_block_t));
+	if (block->state == MEMORY_IN_USE) {
+		block->state = MEMORY_FREE;
+		return 1;
+	}
+	return 0;
+}

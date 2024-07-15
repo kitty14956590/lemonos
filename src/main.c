@@ -32,5 +32,8 @@ int main(uint32_t eax, uint32_t ebx) {
 			block,
 			alloc + block->size
 		);
+
+		phy_free(alloc);
+
 	}
 }
