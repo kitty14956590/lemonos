@@ -117,26 +117,6 @@ typedef struct _HPET {
 	uint8_t protection;
 } __attribute__ ((packed)) HPET_t;
 
-typedef struct _APICHeader {
-	uint8_t type;
-	uint8_t length;
-} __attribute__ ((packed)) APICHeader_t;
-
-typedef struct _APIC {
-	ACPISDTHeader_t header;
-	uint8_t processorID;
-	uint8_t apicID;
-	uint32_t flags;
-} __attribute__ ((packed)) APIC_t;
-
-typedef struct _IOApic {
-	ACPISDTHeader_t header;
-	uint8_t id;
-	uint8_t reserved;
-	uint32_t address;
-	uint32_t base;
-} __attribute__ ((packed)) IOApic_t;
-
 
 enum {
 	GAS_MEMORY_MAPPED = 0,

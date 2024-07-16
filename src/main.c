@@ -8,6 +8,7 @@
 #include <fpu.h>
 #include <acpi.h>
 #include <util.h>
+#include <apic.h>
 
 int main(uint32_t eax, uint32_t ebx) {
 	assert(parse_multiboot(eax, ebx));
@@ -15,6 +16,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	memory_init();
 	fpu_init();
 	acpi_init();
+	apic_init();
 	cprintf(7, u"Kernel loaded \1!\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
