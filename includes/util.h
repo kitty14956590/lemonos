@@ -1,1 +1,2 @@
+void reboot();
 void halt();

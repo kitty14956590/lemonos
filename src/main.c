@@ -5,11 +5,16 @@
 #include <graphics.h>
 #include <stdio.h>
 #include <version.h>
+#include <fpu.h>
+#include <acpi.h>
+#include <util.h>
 
 int main(uint32_t eax, uint32_t ebx) {
 	assert(parse_multiboot(eax, ebx));
 	gfx_init();
-	mmap_parse();
+	memory_init();
+	fpu_init();
+	acpi_init();
 	cprintf(7, u"Kernel loaded \1!\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
@@ -18,8 +23,8 @@ int main(uint32_t eax, uint32_t ebx) {
 	cprintf(7, u" - Heap: 0x%x\n", heap);
 
 	int count = 16;
-        void * alloc;
-        memory_block_t * block;
+	void * alloc;
+	memory_block_t * block;
 	while (count--) {
 		alloc = phy_malloc(count);
 		if (!alloc) {
@@ -36,4 +41,5 @@ int main(uint32_t eax, uint32_t ebx) {
 		phy_free(alloc);
 
 	}
+	reboot();
 }

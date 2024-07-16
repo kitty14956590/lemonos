@@ -1,6 +1,7 @@
 #include <memory.h>
 #include <math.h>
 #include <multiboot.h>
+#include <string.h>
 
 void * heap;
 void * heap_end;
@@ -72,4 +73,11 @@ int phy_free(void * data) {
 		return 1;
 	}
 	return 0;
+}
+
+void memory_init() {
+	void * p;
+	mmap_parse();
+	p = phy_malloc(16);
+	memcpy(p, "__phymem__", 16); // buffer overflow, but who care
 }
