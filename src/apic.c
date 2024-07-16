@@ -33,7 +33,7 @@ void apic_init() {
 		switch (header->type) {
 			case APIC_LOCAL:
 				if (cpu_count < 32) {
-				apics[cpu_count] = apic;
+					apics[cpu_count] = apic;
 				}
 				cpu_count++;
 			case APIC_IO:

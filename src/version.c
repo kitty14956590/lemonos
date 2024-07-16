@@ -2,7 +2,7 @@
 
 int ver_edition = 2;
 int ver_major = 0;
-int ver_minor = 2;
+int ver_minor = 3;
 int ver_patch = 0;
 
 // v2.0.2.0
