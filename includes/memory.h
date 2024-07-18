@@ -19,7 +19,7 @@ extern void * heap;
 extern void * heap_end;
 
 void mmap_parse();
-void * phy_malloc(size_t size);
-int phy_free(void * data);
+void * malloc(size_t size);
+int free(void * data);
 
 void memory_init();

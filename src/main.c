@@ -17,7 +17,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	fpu_init();
 	acpi_init();
 	apic_init();
-	cprintf(7, u"Kernel loaded \1!\n");
+	cprintf(7, u"Kernel loaded \ue027\ue028\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
 	cprintf(7, u"\n\n");
@@ -28,7 +28,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	void * alloc;
 	memory_block_t * block;
 	while (count--) {
-		alloc = phy_malloc(count);
+		alloc = malloc(count);
 		if (!alloc) {
 			continue;
 		}
@@ -40,8 +40,7 @@ int main(uint32_t eax, uint32_t ebx) {
 			alloc + block->size
 		);
 
-		phy_free(alloc);
+		free(alloc);
 
 	}
-	reboot();
 }

@@ -35,7 +35,7 @@ uint32_t font_get_character(uint16_t character) {
 
 void font_truecolour_draw(uint32_t * fb, uint32_t chr, uint32_t colour, uint32_t position) {
         if (chr & 0xff) {
-                fb[position] = (chr >> 8) | 0xff000000;
+                fb[position] = chr;
         }
 }
 

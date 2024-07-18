@@ -38,7 +38,7 @@ void mmap_parse() {
 }
 
 // physical malloc
-void * phy_malloc(size_t size) {
+void * malloc(size_t size) {
 	size_t required_size = round32(size, 8); // round to nearest 8
 	memory_block_t * current_block = (memory_block_t *) heap;
 	void * current = heap;
@@ -62,7 +62,7 @@ void * phy_malloc(size_t size) {
 	return ((void *) current_block) + sizeof(memory_block_t);
 }
 
-int phy_free(void * data) {
+int free(void * data) {
 	memory_block_t * block;
 	if (data < heap || data > heap_end) {
 		return 0;
@@ -78,6 +78,6 @@ int phy_free(void * data) {
 void memory_init() {
 	void * p;
 	mmap_parse();
-	p = phy_malloc(16);
+	p = malloc(16);
 	memcpy(p, "__phymem__", 16); // buffer overflow, but who care
 }
