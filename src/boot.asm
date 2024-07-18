@@ -16,7 +16,8 @@ section .multiboot
 
 section .stack
 stack_bottom:
-times 8000000 db 0  ; 8MB
+; times 8000000 db 0  ; 8MB
+times 131072 - ($-$$) db 0
 stack_top:
 
 section .text

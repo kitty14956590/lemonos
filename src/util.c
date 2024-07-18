@@ -21,8 +21,21 @@ void shutdown() {
 	halt();
 }
 
+void disable_interrupts() {
+	asm volatile ("cli;\n");
+}
+void enable_interrupts() {
+	asm volatile ("sti;\n");
+}
+
 void __attribute__((optimize("O0"))) halt() {
 	for (;;) {
 		asm volatile ("cli\nhlt\n");
+	}
+}
+
+void __attribute__((optimize("O0"))) sleep() {
+	for (;;) {
+		asm volatile ("hlt\n");
 	}
 }

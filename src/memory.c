@@ -9,7 +9,6 @@ void * heap_end;
 size_t heap_length;
 
 void mmap_parse() {
-	uint64_t size = 0;
 	size_t i = 0;
 	heap_length = 0;
 	heap = (void *) 0;

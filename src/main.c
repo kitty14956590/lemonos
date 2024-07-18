@@ -9,38 +9,25 @@
 #include <acpi.h>
 #include <util.h>
 #include <apic.h>
+#include <irq.h>
+#include <pit.h>
+#include <mouse.h>
+#include <keyboard.h>
 
 int main(uint32_t eax, uint32_t ebx) {
 	assert(parse_multiboot(eax, ebx));
-	gfx_init();
+	irq_init();
+	pit_init(60);
+	keyboard_init();
+	mouse_init();
 	memory_init();
+	enable_interrupts();
 	fpu_init();
-	acpi_init();
-	apic_init();
+	gfx_init();
 	cprintf(7, u"Kernel loaded \ue027\ue028\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
-	cprintf(7, u"\n\n");
-	cprintf(7, u"Memory Test:\n");
-	cprintf(7, u" - Heap: 0x%x\n", heap);
-
-	int count = 16;
-	void * alloc;
-	memory_block_t * block;
-	while (count--) {
-		alloc = malloc(count);
-		if (!alloc) {
-			continue;
-		}
-		block = (memory_block_t *) (alloc - sizeof(memory_block_t));
-
-		cprintf(7, u" - (memory %u) 0x%x - 0x%x\n",
-			block->size,
-			block,
-			alloc + block->size
-		);
-
-		free(alloc);
-
-	}
+	acpi_init();
+	apic_init();
+	sleep();
 }

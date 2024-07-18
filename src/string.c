@@ -224,6 +224,14 @@ uint16_t * memset16(uint16_t * dest, uint16_t val, size_t length) {
 	return dest;
 }
 
+void * memset(void * dest, int val, size_t length) {
+	register uint8_t * temp = dest;
+	while (length-- > 0) {
+		*temp++ = val;
+	}
+	return dest;
+}
+
 void * memcpy(void * dest, void * src, size_t length) {
         int d0, d1, d2;
         asm volatile (
