@@ -2,10 +2,13 @@
 #include <graphics.h>
 
 void terminal_cprint(uint16_t * string, uint32_t colour) {
-	int char_width = root_window.size.width / 8; // width in chracters
-	int position = txt_string_draw(string, root_window.cursor.x, root_window.cursor.y, colour, &root_window);
-	root_window.cursor.x = position % char_width;
-	root_window.cursor.y = position / char_width;
+	if (!background.fb) {
+		return;
+	}
+	int char_width = background.size.width / 8; // width in chracters
+	int position = txt_string_draw(string, background.cursor.x, background.cursor.y, colour, &background);
+	background.cursor.x = position % char_width;
+	background.cursor.y = position / char_width;
 }
 
 void terminal_cputc(uint16_t character, uint32_t colour) {

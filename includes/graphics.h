@@ -44,6 +44,8 @@ typedef struct {
 } taskbar_button_t;
 
 extern rect_2d_t root_window;
+extern rect_2d_t back_buffer;
+extern rect_2d_t background;
 extern rect_2d_t taskbar;
 extern rect_2d_t cursor;
 extern linked_t * taskbar_buttons;

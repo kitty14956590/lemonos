@@ -14,7 +14,7 @@ GRUBVOLID := "LEMON_OS"
 GRUBDST := lemonos.iso
 GRUBSRC := src/grub/*
 QEMU := qemu-system-i386
-QEMUFLAGS := -smp 4 -serial stdio -serial vc -vga std
+QEMUFLAGS := -enable-kvm -cpu core2duo -smp 1 -serial stdio -serial vc -vga std
 QEMUMEMORY := 128M
 
 SOURCES=$(wildcard src/*.c)

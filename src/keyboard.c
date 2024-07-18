@@ -2,6 +2,7 @@
 
 #include <irq.h>
 #include <stdint.h>
+#include <ports.h>
 
 uint32_t keyboard_callback(registers_t regs) {
 	while (inb(0x64) & 2) {}

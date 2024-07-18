@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 typedef struct {
         uint16_t vendor;
         uint16_t device;
@@ -17,3 +19,12 @@ typedef struct {
         uint32_t bar5;
         uint32_t id;
 } pci_t;
+
+void pci_add(pci_t * device);
+int pci_exists(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendor, uint16_t device);
+pci_t * pci_get(uint8_t bus, uint8_t slot, uint8_t function);
+uint16_t pci_config_inw(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset);
+uint32_t pci_config_ind(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset);
+uint32_t pci_config_outd(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset, uint32_t d);
+void pci_probe();
+void pci_init();

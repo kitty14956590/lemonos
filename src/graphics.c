@@ -25,6 +25,10 @@ int legacy_colour[16] = {
 };
 
 rect_2d_t root_window;
+rect_2d_t back_buffer;
+
+rect_2d_t background;
+
 rect_2d_t taskbar;
 rect_2d_t cursor;
 linked_t * taskbar_buttons;
@@ -34,6 +38,7 @@ uint32_t button_offset;
 uint32_t button_border = 0xff000000;
 int taskbar_height = 28;
 int gfx_init_done = 0;
+int taskbar_updated = 0;
 
 uint32_t background_colour = 0xff5500aa;
 uint32_t taskbar_colour = 0xffaaaaaa;
@@ -168,7 +173,7 @@ int txt_string_p_draw(uint16_t * string, int x, int y, uint32_t colour, rect_2d_
 	}
 }
 
-// alpha_calculate() + rect_2d_draw() are from LemonOS for linux
+// alpha_calculate() + rect_2d_adraw() are from LemonOS for linux
 uint32_t alpha_calculate(uint32_t top, uint32_t bottom) {
 	float alpha = (float) (top >> 24 & 0xff) / 255;
 	float invert = 1 - alpha;
@@ -186,6 +191,7 @@ uint32_t alpha_calculate(uint32_t top, uint32_t bottom) {
 	return *((uint32_t *) output);
 }
 
+
 void rect_2d_draw(rect_2d_t * rect2, rect_2d_t * rect) {
 	uint32_t * dest;
 	const uint32_t * src;
@@ -202,10 +208,64 @@ void rect_2d_draw(rect_2d_t * rect2, rect_2d_t * rect) {
 			if ((b + rect->x) < 0) {
 				continue;
 			}
-			if ((b + rect->x) > rect2->size.width) {
+			if ((b + rect->x) >= rect2->size.width) {
+				break;
+			}
+			*(dest + b) = *(src + b);
+		}
+	}
+	return;
+}
+
+void rect_2d_adraw(rect_2d_t * rect2, rect_2d_t * rect) {
+	uint32_t * dest;
+	const uint32_t * src;
+	for (int i = 0; i < rect->size.height; i++) {
+		if ((i + rect->y) < 0) {
+			continue;
+		}
+		if ((i + rect->y) >= rect2->size.height) {
+			break;
+		}
+		dest = (uint32_t *) (((void *) rect2->fb) + (((rect->y + i) * (rect2->size.width * 4)) + (rect->x * 4)));
+		src = (uint32_t *) (((void *) rect->fb) + (i * (rect->size.width * 4)));
+		for (int b = 0; b < rect->size.width; b++) {
+			if ((b + rect->x) < 0) {
+				continue;
+			}
+			if ((b + rect->x) >= rect2->size.width) {
 				break;
 			}
 			*(dest + b) = alpha_calculate(*(src + b), *(dest + b));
+		}
+	}
+	return;
+}
+
+// fast transparent draw
+void rect_2d_afdraw(rect_2d_t * rect2, rect_2d_t * rect) {
+	uint32_t * dest;
+	const uint32_t * src;
+	for (int i = 0; i < rect->size.height; i++) {
+		if ((i + rect->y) < 0) {
+			continue;
+		}
+		if ((i + rect->y) >= rect2->size.height) {
+			break;
+		}
+		dest = (uint32_t *) (((void *) rect2->fb) + (((rect->y + i) * (rect2->size.width * 4)) + (rect->x * 4)));
+		src = (uint32_t *) (((void *) rect->fb) + (i * (rect->size.width * 4)));
+		for (int b = 0; b < rect->size.width; b++) {
+			if ((b + rect->x) < 0) {
+				continue;
+			}
+			if ((b + rect->x) >= rect2->size.width) {
+				break;
+			}
+			if (!((*(src + b)) >> 24)) {
+				continue;
+			}
+			*(dest + b) = *(src + b);
 		}
 	}
 	return;
@@ -221,7 +281,7 @@ uint32_t draw_taskbar_button(taskbar_button_t * button, uint32_t x) {
 		{16, 16}
 	};
 
-	rect_2d_draw(&taskbar, &icon);
+	rect_2d_adraw(&taskbar, &icon);
 
 	while (i < len) {
 		gfx_char_p_draw(*p++, 28 + x + (i * 8), 6, 0, &taskbar);
@@ -244,36 +304,50 @@ void draw_taskbar_callback(linked_t * node) {
 }
 
 void draw_taskbar_buttons() {
+	if (!taskbar_updated) {
+		return;
+	}
 	button_offset = 0;
+	memset32(taskbar.fb, taskbar_colour, root_window.size.width * taskbar_height);
 	linked_iterate(taskbar_buttons, draw_taskbar_callback);
+	taskbar_updated = 0;
 }
 
 void draw_frame() {
 	if (!gfx_init_done) {
 		return;
 	}
-	memset32(taskbar.fb, taskbar_colour, root_window.size.width * taskbar_height);
 	draw_taskbar_buttons();
-	rect_2d_draw(&root_window, &taskbar);
-	rect_2d_draw(&root_window, &cursor);
+	rect_2d_draw(&back_buffer, &background);
+	rect_2d_draw(&back_buffer, &taskbar);
+	rect_2d_afdraw(&back_buffer, &cursor);
+	rect_2d_draw(&root_window, &back_buffer);
 }
 
 void gfx_init() {
 	root_window.fb = (uint32_t *) (uint32_t) multiboot_header->framebuffer;
-	root_window.cursor.x = 0;
-	root_window.cursor.y = 0;
-	root_window.x = 0;
-	root_window.y = 0;
 	root_window.size.width = multiboot_header->framebuffer_width;
 	root_window.size.height = multiboot_header->framebuffer_height;
-	memset32(root_window.fb, background_colour, root_window.size.width * root_window.size.height);
+
+	back_buffer.fb = malloc((root_window.size.width * root_window.size.height) * 4);
+	back_buffer.size.width = root_window.size.width;
+	back_buffer.size.height = root_window.size.height;
+
+	background.fb = malloc((root_window.size.width * (root_window.size.height - taskbar_height)) * 4);
+	background.cursor.x = 0;
+	background.cursor.y = 0;
+	background.x = 0;
+	background.y = 0;
+	background.size.width = root_window.size.width;
+	background.size.height = root_window.size.height - taskbar_height;
+	memset32(background.fb, background_colour, background.size.width * background.size.height);
 
 	cursor.fb = malloc(1024);
 	cursor.x = multiboot_header->framebuffer_width / 2;
 	cursor.y = multiboot_header->framebuffer_height / 2;
 	cursor.size.width = 16;
 	cursor.size.height = 16;
-	gfx_char_draw(u'\ue01e', 0, 0, 0, &cursor);
+	gfx_char_draw(u'\ue01e', 0, 0, 0xff000000, &cursor);
 
 	taskbar.fb = malloc((root_window.size.width * taskbar_height) * 4);
 	taskbar.cursor.x = 0;
@@ -289,5 +363,6 @@ void gfx_init() {
 	testbutton.icon = test_icon;
 	taskbar_buttons = linked_add(taskbar_buttons, &startbutton);
 	taskbar_buttons = linked_add(taskbar_buttons, &testbutton);
+	taskbar_updated = 1;
 	gfx_init_done = 1;
 }

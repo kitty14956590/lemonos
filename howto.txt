@@ -3,3 +3,4 @@
 sudo dd if=lemonos.iso of=/dev/sdX
 
 - It spent to entire LemonOS team (me) 7 years to write this insanely complicated command
+

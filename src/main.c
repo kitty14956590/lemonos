@@ -13,6 +13,7 @@
 #include <pit.h>
 #include <mouse.h>
 #include <keyboard.h>
+#include <pci.h>
 
 int main(uint32_t eax, uint32_t ebx) {
 	assert(parse_multiboot(eax, ebx));
@@ -24,10 +25,11 @@ int main(uint32_t eax, uint32_t ebx) {
 	enable_interrupts();
 	fpu_init();
 	gfx_init();
-	cprintf(7, u"Kernel loaded \ue027\ue028\n");
+	cprintf(7, u"Kernel loaded \ue027\ue028 \ue003\ue004\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
 	acpi_init();
+	pci_probe();
 	apic_init();
 	sleep();
 }
