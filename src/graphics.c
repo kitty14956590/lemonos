@@ -26,9 +26,7 @@ int legacy_colour[16] = {
 
 rect_2d_t root_window;
 rect_2d_t back_buffer;
-
 rect_2d_t background;
-
 rect_2d_t taskbar;
 rect_2d_t cursor;
 linked_t * taskbar_buttons;
@@ -101,6 +99,9 @@ void gfx_char_draw(uint16_t character, int x, int y, uint32_t colour, rect_2d_t 
 			pixel = 0; // go back to the start of the line
 		}
 		pixel++;
+		if (position > (rect->size.height * rect->size.width)) {
+			continue;
+		}
 		drawer(rect->fb, font[chr][i + 2], colour, position + pixel);
 	}
 }
@@ -124,37 +125,37 @@ void gfx_char_p_draw(uint16_t character, int x, int y, uint32_t colour, rect_2d_
 
 void gfx_scroll(rect_2d_t * rect) {
 	memcpy32(rect->fb, rect->fb + (rect->size.width * 16), (rect->size.height - 16) * rect->size.width);
-	memset32(rect->fb + ((rect->size.height - 16) * rect->size.width), 0, (rect->size.width * 16));
-	rect->cursor.y--;
+	memset32(rect->fb + ((rect->size.height - 16) * rect->size.width), background_colour, (rect->size.width * 16));
 }
 
 int gfx_string_draw(uint16_t * string, int x, int y, int p, uint32_t colour, rect_2d_t * rect) {
 	int position = x;
 	int yoffset = 0;
-	int char_width = rect->size.width / 8; // height and width in chracters
-	int char_height = rect->size.height / 16;
+	int char_width = (int) (rect->size.width / 8); // height and width in chracters
+	int char_height = (int) (rect->size.height / 16);
 	for (int i = 0; i < ustrlen(string); i++) {
-		if (y + yoffset + position / char_width > char_height) {
+		if (y + (yoffset + 1) + position / char_width > char_height) {
 			gfx_scroll(rect);
 			yoffset--;
 		}
 		if (string[i] != u'\n') {
-			gfx_char_draw(string[i], position, y + yoffset, colour, rect);
+			if (p) {
+				gfx_char_p_draw(string[i], position, y + yoffset, colour, rect);
+			} else {
+				gfx_char_draw(string[i], position, y + yoffset, colour, rect);
+			}
 			if (font[font_get_character(string[i])][1] == FONT_COMBINING) {
 					position--;
 			}
 		}
-		if ((string[i] == u'\n') || (position + 1 == char_width)) {
-			position = -1;
-			yoffset++;
-		}
 		position++;
-		if (position >= char_width) {
+		if (string[i] == u'\n' || position >= char_width) {
 			position = 0;
 			yoffset++;
 		}
 	}
-	return ((y + yoffset) * char_width) + position;
+	rect->cursor.x = position % char_width;
+	rect->cursor.y = y + yoffset;
 }
 
 int txt_string_draw(uint16_t * string, int x, int y, uint32_t colour, rect_2d_t * rect) {

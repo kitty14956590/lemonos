@@ -4,18 +4,24 @@
 #include <ports.h>
 #include <graphics.h>
 #include <stdio.h>
+#include <multitasking.h>
 
-uint64_t ticks = 0;
+volatile uint64_t ticks = 0;
+uint64_t * ticksp;
 
-uint32_t pit_callback(registers_t regs) {
+void pit_callback(registers_t regs) {
+	if (ticks & 0b1000 != 0) {
+		draw_frame();
+	}
 	ticks++;
-	draw_frame();
-	return regs.eax;
+	outb(0x20, 0x20);
+	switch_task();
 }
 
 void pit_init(uint32_t freq) {
+	ticksp = (uint64_t *) &ticks;
 	irq_set_handler(32, &pit_callback);
-	uint32_t divisor = 1193180 / freq;
+	uint32_t divisor = (uint32_t) (1193180 / freq);
 	outb(0x43, 0x36);
 	uint8_t low = (uint8_t) (divisor & 0xFF);
 	uint8_t high = (uint8_t) ((divisor >> 8) & 0xFF);

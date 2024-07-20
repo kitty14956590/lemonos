@@ -44,7 +44,7 @@ void idt_set_gate(uint16_t num, uint32_t base, uint16_t sel, uint8_t flags) {
 	idt_entries[num].base_hi = (base >> 16) & 0xFFFF;
 	idt_entries[num].sel = sel;
 	idt_entries[num].always0 = 0;
-	idt_entries[num].flags = flags | 0x60;
+	idt_entries[num].flags = flags;
 }
 
 void idt_init() {
@@ -116,8 +116,8 @@ void idt_init() {
 }
 
 void gdt_init() {
-	gdt_ptr.limit = (sizeof(gdt_entry_t) * 6) - 1;
-	gdt_ptr.base  = (uint32_t)&gdt_entries;
+	gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
+	gdt_ptr.base  = (uint32_t) &gdt_entries;
 	gdt_set_gate(0, 0, 0, 0, 0);
 	gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
 	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);

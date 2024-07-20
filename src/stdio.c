@@ -2,6 +2,8 @@
 #include <string.h>
 #include <terminal.h>
 #include <stdarg.h>
+#include <serial.h>
+#include <util.h>
 
 void printf(uint16_t * fmt, ...) {
 	va_list listp;
@@ -16,6 +18,7 @@ void printf(uint16_t * fmt, ...) {
 	va_start(listp, fmt);
 	argv = &listp;
 	memset16(buffer, 0, 128);
+	disable_interrupts();
 	while ((c = *fmt) != u'\0') {
 		if (c != u'%') {
 			terminal_putc(c);
@@ -71,6 +74,7 @@ void printf(uint16_t * fmt, ...) {
 		continue;
 		}
 	}
+	enable_interrupts();
 	va_end(listp);
 }
 
@@ -87,6 +91,7 @@ void cprintf(uint32_t colour, uint16_t * fmt, ...) {
 	va_start(listp, fmt);
 	argv = &listp;
 	memset16(buffer, 0, 128);
+	disable_interrupts();
 	while ((c = *fmt) != u'\0') {
 		if (c != u'%') {
 			terminal_cputc(c, colour);
@@ -142,5 +147,80 @@ void cprintf(uint32_t colour, uint16_t * fmt, ...) {
 		continue;
 		}
 	}
+	enable_interrupts();
+	va_end(listp);
+}
+
+// log printf
+void lprintf(uint16_t * fmt, ...) {
+	va_list listp;
+	va_list * argv;
+	uint16_t c;
+	unsigned long ul = 0;
+	long l = 0;
+	double f = 0;
+	uint16_t * p;
+	uint16_t buffer[128];
+	unsigned char * buffer8;
+	va_start(listp, fmt);
+	argv = &listp;
+	memset16(buffer, 0, 128);
+	disable_interrupts();
+	while ((c = *fmt) != u'\0') {
+		if (c != u'%') {
+			serial_outw(COM1_PORT, c);
+			fmt++;
+			continue;
+		} else {
+			fmt++;
+			c = *fmt;
+		if (c == u'0') {
+			break;
+		}
+		switch (c) {
+			default:
+				break;
+			case u'x':
+				ul = (uint32_t) va_arg(*argv, unsigned long);
+				ulldtoustr(ul, buffer, 16);
+				serial_outs(COM1_PORT, buffer);
+				break;
+			case u'f':
+				f = (double) va_arg(*argv, double);
+				ftoustr(f, buffer, 10);
+				serial_outs(COM1_PORT, buffer);
+				break;
+			case u'd':
+				l = (int32_t) va_arg(*argv, long);
+				lldtoustr(l, buffer, 10);
+				serial_outs(COM1_PORT, buffer);
+				break;
+			case u'o':
+				ul = (uint32_t) va_arg(*argv, unsigned long);
+				ulldtoustr(ul, buffer, 8);
+				serial_outs(COM1_PORT, buffer);
+				break;
+			case u'u':
+				ul = (uint32_t) va_arg(*argv, unsigned long);
+				ulldtoustr(ul, buffer, 10);
+				serial_outs(COM1_PORT, buffer);
+				break;
+			case u's':
+				p = (uint16_t *) va_arg(*argv, uint16_t *);
+				serial_outs(COM1_PORT, p);
+				break;
+			case u'c':
+				ul = (uint16_t) va_arg(*argv, uint16_t);
+				serial_outw(COM1_PORT, ul);
+				break;
+			case u'%':
+				serial_outw(COM1_PORT, u'%');
+				break;
+		}
+		fmt++;
+		continue;
+		}
+	}
+	enable_interrupts();
 	va_end(listp);
 }

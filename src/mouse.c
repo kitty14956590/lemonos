@@ -9,7 +9,7 @@ uint8_t mouse_cycle = 0;
 int32_t mouse_y = 0;
 int32_t mouse_x = 0;
 
-uint32_t mouse_handler(registers_t regs) {
+void mouse_handler(registers_t regs) {
 	uint8_t status = inb(0x64);
 	int8_t mouse_in = inb(0x60);
 	if (status & 0x20) {
@@ -17,7 +17,7 @@ uint32_t mouse_handler(registers_t regs) {
 			case 0:
 				mouse_bytes[0] = mouse_in;
 				if (!(mouse_in & 0x08)) {
-					return regs.eax;
+					return;
 				}
 				++mouse_cycle;
 				break;

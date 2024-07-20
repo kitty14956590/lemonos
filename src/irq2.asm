@@ -4,7 +4,7 @@
         cli
         push byte 0
         push  %1
-        jmp isr_common_stub
+        jmp irq_common_stub
 %endmacro
 
 %macro ISR_ERRCODE 1
@@ -12,7 +12,7 @@
   isr%1:
         cli
         push %1
-        jmp isr_common_stub
+        jmp irq_common_stub
 %endmacro
 
 %macro IRQ 2
@@ -21,7 +21,7 @@
         cli
         push byte 0
         push byte %2
-        jmp isr_common_stub
+        jmp irq_common_stub
 %endmacro
 
 [EXTERN switch_task]
@@ -84,43 +84,8 @@ ISR_NOERRCODE 105
 ISR_NOERRCODE 85
 
 irq_common_stub:
-	push eax
-	push ecx
-	push edx
-	push ebx
-	push esp
-	push ebp
-	push esi
-	push edi
-
-	mov ax, ds
-	push eax
-
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	call isr_handler
-	pop ebx
-	mov ds, bx
-	mov es, bx
-	mov fs, bx
-	mov gs, bx
-
-	pop edi
-	pop esi
-	pop ebp
-	pop esp
-	pop ebx
-	pop edx
-	pop ecx
-	add esp, 12
-	sti
-	iret
-
-isr_common_stub:
 	pusha
+	cli
 
 	mov ax, ds
 	push eax
@@ -144,16 +109,43 @@ isr_common_stub:
 	sti
 	iret
 
+isr_common_stub:
+	pusha
+	cli
+
+	mov ax, ds
+	push eax
+
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	call isr_handler
+
+	pop ebx
+	mov ds, bx
+	mov es, bx
+	mov fs, bx
+	mov gs, bx
+
+	popa
+	add esp, 8
+	sti
+	iret
+
 [GLOBAL apic_switch_task]
 
 apic_switch_task:
-	sti
-	push eax
+	pusha
 	mov eax, 0x20
 	out 0xa0, eax
+	mov eax, 0x20
 	out 0x20, eax
-	pop eax
 	call switch_task
+	popa
+	add esp, 8
 	iret
 
 [GLOBAL gdt_flush]

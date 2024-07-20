@@ -16,8 +16,7 @@ section .multiboot
 
 section .stack
 stack_bottom:
-; times 8000000 db 0  ; 8MB
-times 131072 - ($-$$) db 0
+times 8000000 db 0  ; 8MB
 stack_top:
 
 section .text
@@ -26,9 +25,15 @@ align 16
 
 global start
 extern main
+extern sse_init
+extern fpu_init
 start:
 	cli
 	mov esp, stack_top
+	pusha
+	call fpu_init
+	popa
+	mov esp, stack_top ; fixed :3
 	push ebx
 	push eax
 	call main

@@ -22,10 +22,10 @@ void shutdown() {
 }
 
 void disable_interrupts() {
-	asm volatile ("cli;\n");
+	asm ("cli");
 }
 void enable_interrupts() {
-	asm volatile ("sti;\n");
+	asm ("sti");
 }
 
 void __attribute__((optimize("O0"))) halt() {

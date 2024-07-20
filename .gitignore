@@ -11,4 +11,4 @@ build/*
 *.vsix
 *.json
 .git
-
+*.code-workspace

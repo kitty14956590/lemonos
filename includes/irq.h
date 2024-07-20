@@ -29,7 +29,7 @@ typedef struct {
         uint32_t base;
 } __attribute__((packed)) gdt_ptr_t;
 
-typedef uint32_t (*isr_t)(registers_t);
+typedef void (*isr_t)(registers_t);
 
 extern isr_t interrupt_handlers[256];
 extern idt_entry_t idt_entries[256];

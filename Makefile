@@ -4,7 +4,7 @@ CC := gcc
 S := gcc
 ASM := nasm
 ASMFLAGS := -f elf32
-CCFLAGS := -O3 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fallow-store-data-races -fno-builtin -fno-builtin-function -nostdlib -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -funsafe-loop-optimizations -nostdlib -funsigned-char -Iincludes
+CCFLAGS := -O3 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -nostdlib -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes -g
 LD := ld
 LDFLAGS := -m elf_i386
 MAKE := make
@@ -14,7 +14,8 @@ GRUBVOLID := "LEMON_OS"
 GRUBDST := lemonos.iso
 GRUBSRC := src/grub/*
 QEMU := qemu-system-i386
-QEMUFLAGS := -enable-kvm -cpu core2duo -smp 1 -serial stdio -serial vc -vga std
+QEMUFLAGS := -smp 1 -serial stdio -serial vc -vga std
+QEMUDBGFLAGS := -gdb tcp::1234 -S
 QEMUMEMORY := 128M
 
 SOURCES=$(wildcard src/*.c)
@@ -52,3 +53,6 @@ build: $(OBJS) $(ASM_OBJS)
 
 qemu:
 	$(QEMU) $(QEMUFLAGS) -cdrom $(GRUBDST) -m $(QEMUMEMORY)
+
+debug_qemu:
+	$(QEMU) $(QEMUFLAGS) $(QEMUDBGFLAGS) -cdrom $(GRUBDST) -m $(QEMUMEMORY)
