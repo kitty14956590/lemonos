@@ -4,7 +4,7 @@
 
 - [x] Print stuff
 - [x] Manage some memory
-- [ ] FPU
+- [x] FPU
 - [ ] ACPI
 - [ ] Make Thread
 - [ ] Make Processes
