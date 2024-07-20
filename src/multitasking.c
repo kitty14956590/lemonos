@@ -49,29 +49,6 @@ void switch_task() {
 	asm_task_switch(eip, ebp, esp);
 }
 
-/*
-void switch_task() {
-	uint32_t eip, ebp, esp;
-	asm volatile ("cli");
-	save_registers();
-	eip = geteip();
-	if (current_process->tswitch) {
-		load_registers();
-		asm volatile ("sti");
-		current_process->tswitch = 0;
-		return;
-	}
-	current_process->tswitch = 1;
-	multitasking_inc_taskp();
-	current_process->eip = eip;
-	current_process = (process_t *) (linked_get(procs, taskp)->p);
-	eips = current_process->eip;
-	ebps = current_process->ebp;
-	esps = current_process->esp;
-	asm volatile("mov %0, %%esp; mov %1, %%ebp; mov %2, %%eax; sti; jmp *%%eax" :: "r"(esps), "r"(ebps), "r"(eips));
-}
-*/
-
 // testing if multitasking is working (remove me later)
 void test_process() {
 	uint64_t mytick = 0;
