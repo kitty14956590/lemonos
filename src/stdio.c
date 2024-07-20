@@ -6,6 +6,7 @@
 #include <util.h>
 
 void printf(uint16_t * fmt, ...) {
+	disable_interrupts();
 	va_list listp;
 	va_list * argv;
 	uint16_t c;
@@ -18,7 +19,6 @@ void printf(uint16_t * fmt, ...) {
 	va_start(listp, fmt);
 	argv = &listp;
 	memset16(buffer, 0, 128);
-	disable_interrupts();
 	while ((c = *fmt) != u'\0') {
 		if (c != u'%') {
 			terminal_putc(c);
@@ -74,11 +74,12 @@ void printf(uint16_t * fmt, ...) {
 		continue;
 		}
 	}
-	enable_interrupts();
 	va_end(listp);
+	enable_interrupts();
 }
 
 void cprintf(uint32_t colour, uint16_t * fmt, ...) {
+	disable_interrupts();
 	va_list listp;
 	va_list * argv;
 	uint16_t c;
@@ -91,7 +92,6 @@ void cprintf(uint32_t colour, uint16_t * fmt, ...) {
 	va_start(listp, fmt);
 	argv = &listp;
 	memset16(buffer, 0, 128);
-	disable_interrupts();
 	while ((c = *fmt) != u'\0') {
 		if (c != u'%') {
 			terminal_cputc(c, colour);
@@ -147,8 +147,8 @@ void cprintf(uint32_t colour, uint16_t * fmt, ...) {
 		continue;
 		}
 	}
-	enable_interrupts();
 	va_end(listp);
+	enable_interrupts();
 }
 
 // log printf
@@ -165,7 +165,6 @@ void lprintf(uint16_t * fmt, ...) {
 	va_start(listp, fmt);
 	argv = &listp;
 	memset16(buffer, 0, 128);
-	disable_interrupts();
 	while ((c = *fmt) != u'\0') {
 		if (c != u'%') {
 			serial_outw(COM1_PORT, c);
@@ -221,6 +220,5 @@ void lprintf(uint16_t * fmt, ...) {
 		continue;
 		}
 	}
-	enable_interrupts();
 	va_end(listp);
 }

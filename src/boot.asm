@@ -16,7 +16,7 @@ section .multiboot
 
 section .stack
 stack_bottom:
-times 8000000 db 0  ; 8MB
+times 2048 db 0  ; 2kb
 stack_top:
 
 section .text

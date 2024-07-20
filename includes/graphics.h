@@ -52,6 +52,7 @@ extern linked_t * taskbar_buttons;
 extern taskbar_button_t startbutton;
 extern uint32_t button_offset;
 extern int taskbar_height;
+extern int fps;
 
 void gfx_init();
 int txt_string_draw(uint16_t * string, int x, int y, uint32_t colour, rect_2d_t * rect);

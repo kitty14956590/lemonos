@@ -1,8 +1,9 @@
 #include <assert.h>
+#include <panic.h>
 #include <util.h>
 
-void assert(int expr) {
+void assert(int expr, int error) {
 	if (!expr) {
-		halt();
+		handle_error(error);
 	}
 }

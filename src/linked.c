@@ -81,13 +81,27 @@ linked_t * linked_delete(linked_t * node) {
 	return branch == node ? 0 : branch;
 }
 
-void linked_iterate(linked_t * bottom, linked_callback_t callback) {
+void linked_iterate(linked_t * bottom, linked_callback_t callback, void * pass) {
 	if (!bottom) {
 		return;
 	}
 	linked_t * node = bottom;
 	while (node) {
-		callback(node);
+		callback(node, pass);
 		node = node->next;
 	}
+}
+
+linked_t * linked_find(linked_t * bottom, linked_callback_t callback, void * pass) {
+	if (!bottom) {
+		return 0;
+	}
+	linked_t * node = bottom;
+	while (node) {
+		if (callback(node, pass)) {
+			return node;
+		}
+		node = node->next;
+	}
+	return 0;
 }

@@ -3,11 +3,14 @@
 #include <ports.h>
 #include <asm.h>
 #include <irq.h>
+#include <panic.h>
 
 int8_t mouse_bytes[3];
 uint8_t mouse_cycle = 0;
 int32_t mouse_y = 0;
 int32_t mouse_x = 0;
+int left_click = 0;
+int right_click = 0;
 
 void mouse_handler(registers_t regs) {
 	uint8_t status = inb(0x64);
@@ -41,6 +44,11 @@ void mouse_handler(registers_t regs) {
 						mouse_y = 0;
 				} else if (mouse_y > root_window.size.height - 2) {
 						mouse_y = root_window.size.height - 2;
+				}
+				left_click = (mouse_bytes[0] & 0x01);
+				right_click = (mouse_bytes[0] & 0x02) >> 1;
+				if (right_click && mouse_x == 0) {
+					panic();
 				}
 				cursor.x = mouse_x;
 				cursor.y = mouse_y;

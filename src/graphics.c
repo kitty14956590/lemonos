@@ -299,7 +299,7 @@ uint32_t draw_taskbar_button(taskbar_button_t * button, uint32_t x) {
 	return 16 + (len * 8) + 6 + 9;
 }
 
-void draw_taskbar_callback(linked_t * node) {
+int draw_taskbar_callback(linked_t * node, void * p) {
 	taskbar_button_t * button = node->p;
 	button_offset += draw_taskbar_button(button, button_offset);
 }
@@ -310,7 +310,7 @@ void draw_taskbar_buttons() {
 	}
 	button_offset = 0;
 	memset32(taskbar.fb, taskbar_colour, root_window.size.width * taskbar_height);
-	linked_iterate(taskbar_buttons, draw_taskbar_callback);
+	linked_iterate(taskbar_buttons, draw_taskbar_callback, 0);
 	taskbar_updated = 0;
 }
 

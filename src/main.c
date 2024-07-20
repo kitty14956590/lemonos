@@ -3,6 +3,7 @@
 #include <multiboot.h>
 #include <assert.h>
 #include <graphics.h>
+#include <panic.h>
 #include <stdio.h>
 #include <version.h>
 #include <fpu.h>
@@ -16,17 +17,16 @@
 #include <pci.h>
 #include <multitasking.h>
 #include <serial.h>
-#include <sse.h>
 
 int main(uint32_t eax, uint32_t ebx) {
-	assert(parse_multiboot(eax, ebx));
+	assert(parse_multiboot(eax, ebx), MULTIBOOT_ERROR);
 	serial_init();
 	irq_init();
-	pit_init(480);
+	pit_init(1000);
 	keyboard_init();
-	mouse_init();
 	memory_init();
 	gfx_init();
+	mouse_init();
 	cprintf(7, u"Kernel loaded \ue027\ue028 \ue003\ue004\n");
 	cprintf(7, u"\n");
 	cprintf(7, u"You are using LemonOS v%d.%d.%d.%d (%s)\n", ver_edition, ver_major, ver_minor, ver_patch, os_name16);
@@ -35,5 +35,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	acpi_init();
 	pci_probe();
 	apic_init();
+	while (ticks < 1120) {}
+	cprintf(7, u"fps %d\n", fps);
 	sleep();
 }

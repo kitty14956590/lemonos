@@ -1,6 +1,22 @@
 #pragma once
 
 #include <stdint.h>
+#include <asm.h>
+
+enum {
+	MANUAL_PANIC,
+	OUT_OF_MEMORY,
+	MEMORY_CORRUPTION,
+	GENERAL_MEMORY,
+	GENERAL_PROTECTION,
+	GENERAL_PAGE,
+	GENERAL_ARITHMATIC,
+	UNKNOWN_OPCODE,
+	DEVICE_UNAVAILABLE,
+	UNKNOWN_FATAL_ERROR,
+	SHUTDOWN_FAILURE,
+	MULTIBOOT_ERROR,
+};
 
 void panic();
 void panic_irq(registers_t regs);

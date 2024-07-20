@@ -4,7 +4,7 @@ CC := gcc
 S := gcc
 ASM := nasm
 ASMFLAGS := -f elf32
-CCFLAGS := -O3 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -nostdlib -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes -g
+CCFLAGS := -O3 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes -g
 LD := ld
 LDFLAGS := -m elf_i386
 MAKE := make

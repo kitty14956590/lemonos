@@ -85,7 +85,6 @@ ISR_NOERRCODE 85
 
 irq_common_stub:
 	pusha
-	cli
 
 	mov ax, ds
 	push eax
@@ -106,12 +105,10 @@ irq_common_stub:
 
 	popa
 	add esp, 8
-	sti
 	iret
 
 isr_common_stub:
 	pusha
-	cli
 
 	mov ax, ds
 	push eax
@@ -132,7 +129,6 @@ isr_common_stub:
 
 	popa
 	add esp, 8
-	sti
 	iret
 
 [GLOBAL apic_switch_task]

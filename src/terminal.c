@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <graphics.h>
 
+int lock = 0;
+
 void terminal_cprint(uint16_t * string, uint32_t colour) {
 	if (!background.fb) {
 		return;
