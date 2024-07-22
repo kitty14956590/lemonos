@@ -45,8 +45,6 @@ small_mkdir:
 
 clean:
 	rm -rf ${BUILD_DIR} ${OUTPUT} ${GRUBDST}
-
-small_clean:
 	rm -rf ${SMALL_BUILD_DIR} ${SMALL_OUTPUT} ${GRUBDST}
 
 grub:
