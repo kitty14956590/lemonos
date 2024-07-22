@@ -153,6 +153,7 @@ void cprintf(uint32_t colour, uint16_t * fmt, ...) {
 
 // log printf
 void lprintf(uint16_t * fmt, ...) {
+	disable_interrupts();
 	va_list listp;
 	va_list * argv;
 	uint16_t c;
@@ -221,4 +222,5 @@ void lprintf(uint16_t * fmt, ...) {
 		}
 	}
 	va_end(listp);
+	enable_interrupts();
 }

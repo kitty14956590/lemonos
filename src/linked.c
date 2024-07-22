@@ -92,6 +92,22 @@ void linked_iterate(linked_t * bottom, linked_callback_t callback, void * pass) 
 	}
 }
 
+void linked_chop_down(linked_t * bottom, linked_callback_t destroy, void * pass) {
+	if (!bottom) {
+		return;
+	}
+	linked_t * node = bottom;
+	while (node) {
+		linked_t * next = node->next;
+		destroy(node, pass);
+		free(node);
+		node = next;
+	}
+	bottom->next = 0;
+	bottom->back = 0;
+	bottom->p = 0;
+}
+
 linked_t * linked_find(linked_t * bottom, linked_callback_t callback, void * pass) {
 	if (!bottom) {
 		return 0;

@@ -28,7 +28,7 @@ void pit_callback(registers_t regs) {
 }
 
 void pit_init(uint32_t freq) {
-	ticksp = &ticks;
+	ticksp = (uint64_t *) &ticks;
 	irq_set_handler(32, &pit_callback);
 	uint32_t divisor = (uint32_t) (1193180 / freq);
 	outb(0x43, 0x36);

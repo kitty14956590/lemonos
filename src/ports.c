@@ -39,3 +39,35 @@ uint32_t ind(uint16_t port) {
 	asm volatile ("inl %1, %0" : "=a"(ret) : "Nd"(port) : "memory");
 	return ret;
 }
+
+void inb_bin(uint16_t port, uint8_t * buffer, size_t length) {
+	size_t i = 0;
+	while (length--) {
+		buffer[i] = inb(port);
+		i++;
+	}
+}
+
+void inw_bin(uint16_t port, uint16_t * buffer, size_t length) {
+	size_t i = 0;
+	while (length--) {
+		buffer[i] = inw(port);
+		i++;
+	}
+}
+
+void inl_bin(uint16_t port, long * buffer, size_t length) {
+	size_t i = 0;
+	while (length--) {
+		buffer[i] = ind(port);
+		i++;
+	}
+}
+
+void ind_bin(uint16_t port, uint32_t * buffer, size_t length) {
+	size_t i = 0;
+	while (length--) {
+		buffer[i] = ind(port);
+		i++;
+	}
+}

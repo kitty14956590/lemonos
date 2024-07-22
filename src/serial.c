@@ -50,6 +50,13 @@ void serial_outs(int port, uint16_t * data) {
 	}
 }
 
+void serial_outbin(int port, void * data, size_t length) {
+	uint8_t * p = data;
+	for (size_t i = 0; i < length; i++) {
+		serial_outb(port, p[i]);
+	}
+}
+
 void serial_init() {
 	com1_works = 0;
 	com2_works = 0;

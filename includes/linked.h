@@ -17,3 +17,4 @@ linked_t * linked_remove(linked_t * bottom, int index);
 linked_t * linked_delete(linked_t * node);
 void linked_iterate(linked_t * bottom, linked_callback_t callback, void * pass);
 linked_t * linked_find(linked_t * bottom, linked_callback_t callback, void * pass);
+void linked_chop_down(linked_t * bottom, linked_callback_t destroy, void * pass);

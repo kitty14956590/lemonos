@@ -17,6 +17,8 @@
 #include <pci.h>
 #include <multitasking.h>
 #include <serial.h>
+#include <ide.h>
+#include <fdc.h>
 
 int main(uint32_t eax, uint32_t ebx) {
 	assert(parse_multiboot(eax, ebx), MULTIBOOT_ERROR);
@@ -25,6 +27,7 @@ int main(uint32_t eax, uint32_t ebx) {
 	pit_init(1000);
 	keyboard_init();
 	memory_init();
+	ide_init();
 	gfx_init();
 	mouse_init();
 	cprintf(7, u"Kernel loaded \ue027\ue028 \ue003\ue004\n");

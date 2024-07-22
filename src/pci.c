@@ -5,6 +5,7 @@
 #include <ports.h>
 
 linked_t * pci_devices;
+linked_t * pci_handlers;
 
 void pci_add(pci_t * device) {
 	linked_t * branch = linked_add(pci_devices, device);
@@ -12,6 +13,13 @@ void pci_add(pci_t * device) {
 		return;
 	}
 	pci_devices = branch;
+}
+
+void pci_add_handler(pci_callback_t callback, pci_callback_t check) {
+	pci_handler_t * handler = malloc(sizeof(pci_handler_t) + 8);
+	handler->callback = callback;
+	handler->check = check;
+	pci_handlers = linked_add(pci_handlers, handler);
 }
 
 int pci_exists(uint8_t bus, uint8_t slot, uint8_t function, uint16_t vendor, uint16_t device) {
@@ -56,6 +64,18 @@ uint32_t pci_config_outd(uint8_t bus, uint8_t slot, uint8_t function, uint8_t of
 	outl(0xcfc, d);
 }
 
+int pci_destroy_handler(linked_t * node, void * p) {
+	free(p);
+}
+
+int pci_call_handlers(linked_t * node, void * p) {
+	pci_t * device = p;
+	pci_handler_t * handler = node->p;
+	if (handler->check(device)) {
+		handler->callback(device);
+	}
+}
+
 void pci_probe() {
 	uint32_t bus = 0, slot = 0, function = 0;
 	while (bus < 256) {
@@ -76,12 +96,21 @@ void pci_probe() {
 				pci_device->subclass = (class >> 8) & 0xff;
 				pci_device->function = function;
 				pci_device->slot = slot;
-				pci_device->bus = bus;
+				pci_device->bar0 = pci_config_ind(bus, slot, function, 0x10); // free bars!
+				pci_device->bar1 = pci_config_ind(bus, slot, function, 0x14);
+				pci_device->bar2 = pci_config_ind(bus, slot, function, 0x18);
+				pci_device->bar3 = pci_config_ind(bus, slot, function, 0x1c);
+				pci_device->bar4 = pci_config_ind(bus, slot, function, 0x20);
+				pci_device->bar5 = pci_config_ind(bus, slot, function, 0x24);
 				pci_add(pci_device);
+				linked_iterate(pci_handlers, pci_call_handlers, pci_device);
 				function++;
 			}
 			slot++;
 		}
 		bus++;
 	}
+
+	// we dont need this anymore (and we really need the memory)
+	linked_chop_down(pci_handlers, pci_destroy_handler, 0);
 }

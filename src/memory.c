@@ -74,6 +74,20 @@ int free(void * data) {
 	return 0;
 }
 
+void * realloc(void * p, size_t size) {
+	memory_block_t * block;
+	if (!size) {
+		free(p);
+		return 0;
+	}
+	block = (memory_block_t *) (p - sizeof(memory_block_t));
+	if (block->size >= size) {
+		return p;
+	}
+	free(p);
+	return malloc(size);
+}
+
 void memory_init() {
 	void * p;
 	mmap_parse();
