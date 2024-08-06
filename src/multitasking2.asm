@@ -12,6 +12,6 @@ asm_task_switch:
 	mov ecx, [esp+4]
 	mov ebp, [esp+8]
 	mov esp, [esp+12]
-	mov eax, 0x1234
+	mov eax, 0
 	sti
 	jmp ecx

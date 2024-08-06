@@ -11,22 +11,29 @@ idt_ptr_t idt_ptr;
 gdt_entry_t gdt_entries[5];
 gdt_ptr_t gdt_ptr;
 
-void irq_handler(registers_t regs) {
-	if (interrupt_handlers[regs.int_no] != 0) {
-		isr_t handler = interrupt_handlers[regs.int_no];
-		handler(regs);
-	}
-	if (regs.int_no >= 40) {
+void irq_ack(uint32_t number) {
+	if (number >= 40) {
 		outb(0xA0, 0x20);
 	}
 	outb(0x20, 0x20);
 }
 
-void isr_handler(registers_t regs) {
-	if (interrupt_handlers[regs.int_no] != 0) {
-		isr_t handler = interrupt_handlers[regs.int_no];
-		handler(regs);
+void irq_handler(registers_t * regs) {
+	if (interrupt_handlers[regs->int_no] == 0) {
+		irq_ack(regs->int_no);
+		return;
 	}
+	isr_t handler = interrupt_handlers[regs->int_no];
+	handler(regs);
+	irq_ack(regs->int_no);
+}
+
+void isr_handler(registers_t * regs) {
+	if (interrupt_handlers[regs->int_no] == 0) {
+		return;
+	}
+	isr_t handler = interrupt_handlers[regs->int_no];
+	handler(regs);
 }
 
 void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
@@ -109,7 +116,7 @@ void idt_init() {
 	idt_set_gate(45, (uint32_t) irq13, 0x08, 0x8E);
 	idt_set_gate(46, (uint32_t) irq14, 0x08, 0x8E);
 	idt_set_gate(47, (uint32_t) irq15, 0x08, 0x8E);
-	idt_set_gate(48, (uint32_t) apic_switch_task, 0x08, 0x8E);
+	idt_set_gate(48, (uint32_t) irq16, 0x08, 0x8E);
 	idt_set_gate(127, (uint32_t) isr127, 0x08, 0x8E);
 	idt_set_gate(128, (uint32_t) isr128, 0x08, 0x8E);
 	idt_flush((uint32_t) &idt_ptr);
@@ -130,18 +137,53 @@ void irq_set_handler(uint8_t n, isr_t handler) {
 	interrupt_handlers[n] = handler;
 }
 
-uint32_t irq_null(registers_t regs) {}
+void irq_null(registers_t * regs) {}
+
+void irq_division_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(GENERAL_ARITHMATIC, &regs);
+}
+
+void irq_opcode_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(UNKNOWN_OPCODE, &regs);
+}
+
+void irq_device_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(DEVICE_UNAVAILABLE, &regs);
+}
+
+void irq_double_fault_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(UNKNOWN_FATAL_ERROR, &regs);
+}
+
+void irq_segfault_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(SEGMENTATION_FAULT, &regs);
+}
+
+void irq_gp_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(GENERAL_PROTECTION, &regs);
+}
+
+void irq_page_fault_error(registers_t * regs) {
+	irq_ack(regs->int_no);
+	panic(GENERAL_PAGE, &regs);
+}
 
 void irq_init() {
 	gdt_init();
 	idt_init();
 	memset(&interrupt_handlers, 0, sizeof(isr_t) * 256);
-	irq_set_handler(0, &panic_irq);
-	irq_set_handler(6, &panic_irq);
-	irq_set_handler(7, &panic_irq);
-	irq_set_handler(8, &panic_irq);
-	irq_set_handler(11, &panic_irq);
-	irq_set_handler(12, &panic_irq);
-	irq_set_handler(13, &panic_irq);
-	irq_set_handler(14, &panic_irq);
+	irq_set_handler(0, &irq_division_error);
+	irq_set_handler(6, &irq_opcode_error);
+	irq_set_handler(7, &irq_device_error);
+	irq_set_handler(8, &irq_double_fault_error);
+	irq_set_handler(11, &irq_segfault_error);
+	irq_set_handler(12, &irq_segfault_error);
+	irq_set_handler(13, &irq_gp_error);
+	irq_set_handler(14, &irq_page_fault_error);
 }

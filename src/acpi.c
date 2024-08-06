@@ -2,6 +2,8 @@
 #include <acpi.h>
 #include <ports.h>
 #include <string.h>
+#include <util.h>
+#include <serial.h>
 
 RSDP_t * RSDP = 0;
 FADT_t * FADT = 0;
@@ -50,34 +52,14 @@ int acpi_reboot() {
 	if (!FADT) {
 		return 0;
 	}
-	switch (FADT->ResetReg.AddressSpace) {
-		default:
-			return 0;
-
-		case GAS_PIO:
-			outb(FADT->ResetReg.Address, FADT->ResetValue);
-			break;
-
-		case GAS_MEMORY_MAPPED:
-			*((uint8_t *) ((uint32_t) FADT->ResetReg.Address)) = FADT->ResetValue;
-			break;
-
-		case GAS_PCI_CONFIG:
-			// unreadable
-			break;
-	}
-	return 1;
+	return 0;
 }
 
 int acpi_shutdown() {
 	if (!FADT) {
 		return 0;
 	}
-	outw((unsigned int) FADT->PM1aControlBlock, 1 << 13);
-	if (FADT->PM1bControlBlock != 0) {
-		outw((unsigned int) FADT->PM1bControlBlock, 1 << 13);
-	}
-	return 1;
+	return 0;
 }
 
 void acpi_init() {
@@ -85,6 +67,5 @@ void acpi_init() {
 	if (!FADT) {
 		return;
 	}
-	outb(FADT->SMI_CommandPort, FADT->AcpiEnable);
 	acpi_working = 1;
 }

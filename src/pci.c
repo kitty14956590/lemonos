@@ -52,6 +52,13 @@ uint16_t pci_config_inw(uint8_t bus, uint8_t slot, uint8_t function, uint8_t off
 	return inl(0xcfc) >> ((offset & 2) * 8);
 }
 
+
+uint8_t pci_config_inb(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset) {
+	uint32_t address = (uint32_t) ((bus << 16) | (slot << 11) | (function << 8) | (offset & 0xfc) | (0x80000000));
+	outl(0xcf8, address);
+	return inl(0xcfc) >> ((offset & 2) * 12);
+}
+
 uint32_t pci_config_ind(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset) {
 	uint32_t address = (uint32_t) ((bus << 16) | (slot << 11) | (function << 8) | (offset & 0xfc) | (0x80000000));
 	outl(0xcf8, address);
@@ -62,6 +69,20 @@ uint32_t pci_config_outd(uint8_t bus, uint8_t slot, uint8_t function, uint8_t of
 	uint32_t address = (uint32_t) ((bus << 16) | (slot << 11) | (function << 8) | (offset & 0xfc) | (0x80000000));
 	outl(0xcf8, address);
 	outl(0xcfc, d);
+}
+
+uint32_t pci_config_outw(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset, uint16_t d) {
+	uint32_t address = (uint32_t) ((bus << 16) | (slot << 11) | (function << 8) | (offset & 0xfc) | (0x80000000));
+	uint32_t old = pci_config_ind(bus, slot, function, offset) & 0x0000ffff;
+	outl(0xcf8, address);
+	outl(0xcfc, old | (d << 16));
+}
+
+uint32_t pci_config_outb(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset, uint8_t d) {
+	uint32_t address = (uint32_t) ((bus << 16) | (slot << 11) | (function << 8) | (offset & 0xfc) | (0x80000000));
+	uint32_t old = pci_config_ind(bus, slot, function, offset) & 0x00ffffff;
+	outl(0xcf8, address);
+	outl(0xcfc, old | (d << 24));
 }
 
 int pci_destroy_handler(linked_t * node, void * p) {
@@ -77,7 +98,9 @@ int pci_call_handlers(linked_t * node, void * p) {
 }
 
 void pci_probe() {
-	uint32_t bus = 0, slot = 0, function = 0;
+	uint32_t bus = 0;
+	uint32_t slot = 0;
+	uint32_t function = 0;
 	while (bus < 256) {
 		while (slot < 32) {
 			while (function < 8) {

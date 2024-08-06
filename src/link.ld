@@ -13,5 +13,6 @@ SECTIONS
                 .bss : { *(.bss) }
         }
 __end__ = ALIGN(8);
+_kernel_start = __start__;
 _kernel_size = __end__ - __start__;
 _kernel_end = ALIGN(8);

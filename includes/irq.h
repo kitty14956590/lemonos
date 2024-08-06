@@ -29,7 +29,7 @@ typedef struct {
         uint32_t base;
 } __attribute__((packed)) gdt_ptr_t;
 
-typedef void (*isr_t)(registers_t);
+typedef void (*isr_t)(registers_t *);
 
 extern isr_t interrupt_handlers[256];
 extern idt_entry_t idt_entries[256];
@@ -37,14 +37,16 @@ extern idt_ptr_t idt_ptr;
 extern gdt_entry_t gdt_entries[5];
 extern gdt_ptr_t gdt_ptr;
 
-void irq_handler(registers_t regs);
-void isr_handler(registers_t regs);
+void irq_handler(registers_t * regs);
+void isr_handler(registers_t * regs);
 void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 void idt_set_gate(uint16_t num, uint32_t base, uint16_t sel, uint8_t flags);
 void idt_init();
 void gdt_init();
 void irq_set_handler(uint8_t n, isr_t handler);
 void irq_init();
+void irq_null(registers_t * regs);
+void irq_ack(uint32_t number);
 
 extern void gdt_flush(uint32_t);
 extern void idt_flush(uint32_t);
@@ -98,6 +100,6 @@ extern void irq12();
 extern void irq13();
 extern void irq14();
 extern void irq15();
-extern void apic_switch_task();
+extern void irq16();
 extern void isr127();
 extern void isr128();

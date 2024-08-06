@@ -1,6 +1,7 @@
 #include <acpi.h>
 #include <ports.h>
 #include <util.h>
+#include <panic.h>
 
 void reboot() {
 	if (acpi_working && acpi_reboot()) {
@@ -11,6 +12,7 @@ void reboot() {
 		wait = inb(0x64);
 	}
 	outb(0x64, 0xFE);
+	handle_error(SHUTDOWN_FAILURE, 0);
 	halt();
 }
 
@@ -18,6 +20,7 @@ void shutdown() {
 	if (acpi_working && acpi_shutdown()) {
 		return;
 	}
+	handle_error(SHUTDOWN_FAILURE, 0);
 	halt();
 }
 

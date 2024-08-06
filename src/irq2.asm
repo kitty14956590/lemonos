@@ -3,7 +3,7 @@
   isr%1:
         cli
         push byte 0
-        push  %1
+        push %1
         jmp irq_common_stub
 %endmacro
 
@@ -79,68 +79,17 @@ IRQ  12,    44
 IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
+IRQ  16,    48
 
 ISR_NOERRCODE 105
 ISR_NOERRCODE 85
 
 irq_common_stub:
-	pusha
-
-	mov ax, ds
-	push eax
-
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-
+	pushad
+	push esp
 	call irq_handler
-
-	pop ebx
-	mov ds, bx
-	mov es, bx
-	mov fs, bx
-	mov gs, bx
-
-	popa
-	add esp, 8
-	iret
-
-isr_common_stub:
-	pusha
-
-	mov ax, ds
-	push eax
-
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-
-	call isr_handler
-
-	pop ebx
-	mov ds, bx
-	mov es, bx
-	mov fs, bx
-	mov gs, bx
-
-	popa
-	add esp, 8
-	iret
-
-[GLOBAL apic_switch_task]
-
-apic_switch_task:
-	pusha
-	mov eax, 0x20
-	out 0xa0, eax
-	mov eax, 0x20
-	out 0x20, eax
-	call switch_task
-	popa
+	add esp, 4
+	popad
 	add esp, 8
 	iret
 

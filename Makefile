@@ -6,10 +6,11 @@ S := gcc
 ASM := nasm
 ASMFLAGS := -f elf32
 ASMSMALLFLAGS := -f elf32
-CCFLAGS := -O3 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes
+CCFLAGS := -O2 -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes -g
 CCSMALLFLAGS := -Oz -mgeneral-regs-only -mhard-float -static -m32 -mmmx -fno-builtin -fno-builtin-function -fno-defer-pop -fomit-frame-pointer -falign-functions=16 -nostdlib -funsigned-char -Iincludes
 LD := ld
-LDFLAGS := -m elf_i386 --strip-all --discard-all --discard-locals
+LDFLAGS := -m elf_i386
+# --strip-all --discard-all --discard-locals
 LDSMALLFLAGS := -m elf_i386 --strip-all --discard-all --discard-locals --strip-debug
 MAKE := make
 AR := ar
@@ -19,7 +20,7 @@ GRUBVOLID := "LEMON_OS"
 GRUBDST := lemonos.iso
 GRUBSRC := src/grub/*
 QEMU := qemu-system-i386
-QEMUFLAGS := --enable-kvm -smp 1 -serial file:serial.txt -vga std
+QEMUFLAGS := --enable-kvm -smp 1 -serial stdio -vga std -machine acpi=on
 QEMUIDE := -blockdev driver=file,node-name=f0,filename=disk.img -device floppy,drive=f0
 QEMUDBGFLAGS := -gdb tcp::1234 -S
 QEMUMEMORY := 128M
@@ -29,8 +30,12 @@ ASM_SOURCES=$(wildcard src/*.asm)
 
 OBJS=$(patsubst src/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 ASM_OBJS=$(patsubst src/%.asm,$(BUILD_DIR)/%.o,$(ASM_SOURCES))
+
 SMALL_OBJS=$(patsubst src/%.c,$(SMALL_BUILD_DIR)/%.o,$(SOURCES))
 SMALL_ASM_OBJS=$(patsubst src/%.asm,$(SMALL_BUILD_DIR)/%.o,$(ASM_SOURCES))
+
+UACPI_OBJS=$(wildcard uacpi/*.o)
+
 OUTPUT := kernel.bin
 SMALL_OUTPUT := kernel.bin
 
@@ -76,10 +81,10 @@ $(SMALL_BUILD_DIR)/%.o: src/%.asm
 	$(ASM) $(ASMSMALLFLAGS) $^ -o $@
 
 build: $(OBJS) $(ASM_OBJS)
-	$(LD) $(LDFLAGS) -T src/link.ld -o $(OUTPUT) $^
+	$(LD) $(LDFLAGS) -T src/link.ld -o $(OUTPUT) $(UACPI_OBJS) $^
 
 small_build: $(SMALL_OBJS) $(SMALL_ASM_OBJS)
-	$(LD) $(LDFLAGS) -T src/link.ld -o $(SMALL_OUTPUT) $^
+	$(LD) $(LDFLAGS) -T src/link.ld -o $(SMALL_OUTPUT) $(UACPI_OBJS) $^
 
 qemu:
 	$(QEMU) $(QEMUFLAGS) -cdrom $(GRUBDST) -m $(QEMUMEMORY)

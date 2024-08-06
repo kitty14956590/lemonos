@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <string.h>
+#include <memory.h>
 
 double rounders[] = {
 	0.5,
@@ -200,7 +202,31 @@ uint16_t * ftoustr(double f, uint16_t * buf, int precision) {
 	return buf;
 }
 
+uint16_t * ustrcpy(uint16_t * dest, uint16_t * src) {
+	return memcpy(dest, src, (ustrlen(src) * 2) + 2);
+}
+
+char * strcpy(char * dest, char * src) {
+	return memcpy(dest, src, strlen(src) + 1);
+}
+
+uint16_t * ustrdup(uint16_t * string) {
+	return ustrcpy(malloc((ustrlen(string) * 2) + 2), string);
+}
+
+char * strdup(char * string) {
+	return strcpy(malloc(strlen(string) + 1), string);
+}
+
 int ustrlen(uint16_t * string) {
+	int i = 0;
+	while (*string++) {
+		i++;
+	}
+	return i;
+}
+
+int strlen(const char * string) {
 	int i = 0;
 	while (*string++) {
 		i++;
@@ -232,7 +258,7 @@ void * memset(void * dest, int val, size_t length) {
 	return dest;
 }
 
-void * memcpy(void * dest, void * src, size_t length) {
+void * memcpy(void * dest, const void * src, size_t length) {
         int d0, d1, d2;
         asm volatile (
                 "rep ; movsl\n\t"

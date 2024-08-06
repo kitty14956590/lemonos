@@ -103,9 +103,6 @@ void linked_chop_down(linked_t * bottom, linked_callback_t destroy, void * pass)
 		free(node);
 		node = next;
 	}
-	bottom->next = 0;
-	bottom->back = 0;
-	bottom->p = 0;
 }
 
 linked_t * linked_find(linked_t * bottom, linked_callback_t callback, void * pass) {
@@ -118,6 +115,20 @@ linked_t * linked_find(linked_t * bottom, linked_callback_t callback, void * pas
 			return node;
 		}
 		node = node->next;
+	}
+	return 0;
+}
+
+linked_t * linked_find_back(linked_t * bottom, linked_callback_t callback, void * pass) {
+	if (!bottom) {
+		return 0;
+	}
+	linked_t * node = linked_leaf(bottom);
+	while (node) {
+		if (callback(node, pass)) {
+			return node;
+		}
+		node = node->back;
 	}
 	return 0;
 }
